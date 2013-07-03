@@ -1,0 +1,26 @@
+{
+  "name": "karma-growl-reporter",
+  "version": "0.0.1",
+  "description": "A Karma plugin. Report results with growl.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/karma-runner/karma-growl-reporter.git"
+  },
+  "keywords": [
+    "karma-plugin",
+    "reporter",
+    "growl"
+  ],
+  "author": "Vojta Jina <vojta.jina@gmail.com>",
+  "dependencies": {
+    "growly": "~1.1.0"
+  },
+  "peerDependencies": {
+    "karma": "~0.9"
+  },
+  "license": "MIT"
+}
