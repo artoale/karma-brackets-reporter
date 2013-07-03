@@ -27,7 +27,7 @@ var OPTIONS = {
 
 var GrowlReporter = function(helper, logger) {
   var log = logger.create('reporter.growl');
-
+  console.log('Merdaaaaaaaa');
   var optionsFor = function(type, browser) {
     return helper.merge(OPTIONS[type], {title: util.format(OPTIONS[type].title, browser)});
   };
