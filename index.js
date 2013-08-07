@@ -1,68 +1,88 @@
-var util = require('util');
-var growly = require('growly');
-var path = require('path');
 
-var MSG_SUCCESS = '%d tests passed in %s.';
-var MSG_FAILURE = '%d/%d tests failed in %s.';
-var MSG_ERROR = '';
 
-var OPTIONS = {
-  success: {
-    dispname: 'Success',
-    title: 'PASSED - %s',
-    icon: path.join(__dirname, 'images/success.png')
-  },
-  failed: {
-    dispname: 'Failure',
-    title: 'FAILED - %s',
-    icon: path.join(__dirname, 'images/failed.png')
-  },
-  error: {
-    dispname: 'Aborted',
-    title: 'ERROR - %s',
-    icon: path.join(__dirname, 'images/error.png')
-  }
+var io = require('socket.io-client');
+
+
+var BracketsReporter = function (config, formatError) {
+    'use strict';
+
+
+    var sock = io.connect('http://localhost:5000');
+
+    sock.on('error', function () {
+        console.warn('Unable to connect to http://localhost:5000');
+    });
+
+    var socket = {
+        emit: function (msg, data) {
+            // console.warn('no server found, skipping');
+            this.queue.push({
+                msg: msg,
+                data: data
+            });
+        },
+        queue: []
+    };
+    sock.on('connect', function () {
+        if (socket.queue.length > 0) {
+            socket.queue.forEach(function (item) {
+                sock.emit(item.msg, item.data);
+            });
+            socket.queue = [];
+        }
+        socket = sock;
+
+    });
+
+    this.onRunStart = function (browsers) {
+        var toEmit = [];
+        browsers.forEach(function(browser) {
+            toEmit.push(browser);
+        });
+        //console.log('toEmit', toEmit);
+        socket.emit('runStart', toEmit);
+    };
+    
+    this.onBrowserError = function (browser, error) {
+        //console.log('onBrowserError b:', browser);
+        socket.emit('browserError', {
+            browser: browser,
+            error: formatError(error)
+        });
+    };
+
+    this.onSpecComplete = function (browser, result) {
+        //console.log('onSpecComplete');
+        socket.emit('specComplete', {
+            browser: browser,
+            result: result
+        });
+    };
+
+    this.onBrowserComplete = function (browser) {
+
+        //console.log('onBrowserComplete');
+        socket.emit('browserComplete', {
+            browser: browser
+        });
+    
+    };
+
+    this.onRunComplete = function (browsers, results) {
+        // console.log(results);
+        //console.log('onRunComplete');
+        socket.emit('runComplete', {
+            browsers: browsers,
+            results: results
+        });
+
+    };
+    this.adapters = [];
+
+
 };
-
-
-var GrowlReporter = function(helper, logger) {
-  var log = logger.create('reporter.growl');
-  console.log('Merdaaaaaaaa');
-  var optionsFor = function(type, browser) {
-    return helper.merge(OPTIONS[type], {title: util.format(OPTIONS[type].title, browser)});
-  };
-
-  growly.register('Karma', '', [], function(error) {
-    var warning = 'No running verion of GNTP found.\n' +
-                  'For more information see https://github.com/theabraham/growly.';
-    if (error) {
-      log.warn(warning);
-    }
-  });
-
-  this.adapters = [];
-
-  this.onBrowserComplete = function(browser) {
-    var results = browser.lastResult;
-    var time = helper.formatTimeInterval(results.totalTime);
-
-    if (results.disconnected || results.error) {
-      return growly.notify(MSG_ERROR, optionsFor('error', browser.name));
-    }
-
-    if (results.failed) {
-      return growly.notify(util.format(MSG_FAILURE, results.failed, results.total, time),
-          optionsFor('failed', browser.name));
-    }
-
-    growly.notify(util.format(MSG_SUCCESS, results.success, time), optionsFor('success',
-        browser.name));
-  };
-};
-
-GrowlReporter.$inject = ['helper', 'logger'];
-
+BracketsReporter.$inject = ['config', 'formatError'];
 // PUBLISH DI MODULE
 module.exports = {
-  'reporter:growl': ['type', GrowlReporter]
+  'reporter:brackets': ['type', BracketsReporter]
 };
