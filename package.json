@@ -1,21 +1,23 @@
 {
-  "name": "karma-brackets",
-  "version": "0.0.1",
-  "description": "Allow karma to comunicate with brackets",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/artoale/karma-brackets-reporter.git"
-  },
-  "keywords": [
+    "name": "karma-brackets",
+    "version": "0.0.1",
+    "description": "Allow karma to comunicate with brackets",
+    "main": "index.js",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/artoale/karma-brackets-reporter.git"
+    },
+    "keywords": [
     "karma-plugin",
     "reporter",
     "brackets"
-  ],
-  "author": "Alessandro Artoni <artoale@gmail.com>",
-  "peerDependencies": {
-    "karma": "~0.10",
-    "socket.io-client": "*"
-  },
-  "license": "MIT"
+    ],
+    "author": "Alessandro Artoni <artoale@gmail.com>",
+    "peerDependencies": {
+        "karma": "~0.10"
+    },
+    "dependencies": {
+        "socket.io-client": "*"
+    }
+    "license": "MIT"
 }
