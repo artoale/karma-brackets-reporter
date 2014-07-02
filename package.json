@@ -14,10 +14,10 @@
     ],
     "author": "Alessandro Artoni <artoale@gmail.com>",
     "peerDependencies": {
-        "karma": "~0.10"
+        "karma": ">0.10"
     },
     "dependencies": {
-        "socket.io-client": "*"
+        "socket.io": "~1.0.6"
     },
     "license": "MIT"
 }

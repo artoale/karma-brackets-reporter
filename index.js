@@ -26,37 +26,33 @@
 
 /*jslint vars: true, devel: true, nomen: true, indent: 4, maxerr: 50, node: true */
 
-var io = require('socket.io-client');
+var sio = require('socket.io');
 
 
-var BracketsReporter = function (config, formatError) {
+var BracketsReporter = function (config, formatError, logger) {
     'use strict';
+    var console = logger.create('Brackets reporter');
+    var port = config.brackets && config.brackets.port || 5000;
+    var io = sio(port);
 
-
-    var sock = io.connect('http://localhost:5000');
-
-    sock.on('error', function () {
-        console.warn('Unable to connect to http://localhost:5000');
+    io.on('error', function () {
+        console.warn('Unable to start server at http://localhost:' + port);
     });
 
-    var socket = {
-        emit: function (msg, data) {
-            // console.warn('no server found, skipping');
-            this.queue.push({
-                msg: msg,
-                data: data
+    io.on('connection', function (socket) {
+            console.info('reporter connected');
+            socket.on('runStart', function (brws) {
+                _domainManager.emitEvent("karmaServer", "runStart", [brws]);
             });
-        },
-        queue: []
-    };
-    sock.on('connect', function () {
-        if (socket.queue.length > 0) {
-            socket.queue.forEach(function (item) {
-                sock.emit(item.msg, item.data);
+            socket.on('runComplete', function (data) {
+                _domainManager.emitEvent("karmaServer", "runComplete", [data]);
             });
-            socket.queue = [];
-        }
-        socket = sock;
+            socket.on('browserError', function (data) {
+                _domainManager.emitEvent("karmaServer", "browserError", [data]);
+            });
+            socket.on('specComplete', function (data) {
+                _domainManager.emitEvent("karmaServer", "specComplete", [data]);
+            });
 
     });
 
@@ -65,32 +61,32 @@ var BracketsReporter = function (config, formatError) {
         browsers.forEach(function (browser) {
             toEmit.push(browser);
         });
-        socket.emit('runStart', toEmit);
+        io.emit('runStart', toEmit);
     };
 
     this.onBrowserError = function (browser, error) {
-        socket.emit('browserError', {
+        io.emit('browserError', {
             browser: browser,
             error: formatError(error)
         });
     };
 
     this.onSpecComplete = function (browser, result) {
-        socket.emit('specComplete', {
+        io.emit('specComplete', {
             browser: browser,
             result: result
         });
     };
 
     this.onBrowserComplete = function (browser) {
-        socket.emit('browserComplete', {
+        io.emit('browserComplete', {
             browser: browser
         });
 
     };
 
     this.onRunComplete = function (browsers, results) {
-        socket.emit('runComplete', {
+        io.emit('runComplete', {
             browsers: browsers,
             results: results
         });
@@ -101,7 +97,7 @@ var BracketsReporter = function (config, formatError) {
 
 };
 //Explicitily configure and export di module
-BracketsReporter.$inject = ['config', 'formatError'];
+BracketsReporter.$inject = ['config', 'formatError', 'logger'];
 
 module.exports = {
     'reporter:brackets': ['type', BracketsReporter]
