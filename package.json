@@ -1,6 +1,6 @@
 {
     "name": "karma-brackets",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Allow karma to comunicate with brackets",
     "main": "index.js",
     "repository": {
@@ -14,7 +14,7 @@
     ],
     "author": "Alessandro Artoni <artoale@gmail.com>",
     "peerDependencies": {
-        "karma": ">0.10"
+        "karma": "~0.12"
     },
     "dependencies": {
         "socket.io": "~1.0.6"
