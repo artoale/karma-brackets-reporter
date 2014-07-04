@@ -1,6 +1,6 @@
 {
     "name": "karma-brackets",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "description": "Allow karma to comunicate with brackets",
     "main": "index.js",
     "repository": {

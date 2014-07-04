@@ -1,7 +1,7 @@
 /**
  * Karma reporter for brackets
  * 
- * @author Alessandro Artoni <artoale@gmail.com>
+ * @author Alessandro Artoni <artoale@gmail.com> https://github.com/artoale
  * 
  * The MIT Licence
  * Copyright (C) 2013 Alessandro Artoni <artoale@gmail.com>
@@ -40,7 +40,7 @@ var BracketsReporter = function (config, formatError, logger) {
     });
 
     io.on('connection', function (socket) {
-            console.info('reporter connected');
+            console.info('Client connected to brackets reporter');
             socket.on('runStart', function (brws) {
                 _domainManager.emitEvent("karmaServer", "runStart", [brws]);
             });
